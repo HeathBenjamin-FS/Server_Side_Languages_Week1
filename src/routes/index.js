@@ -10,10 +10,16 @@ let randomStuff = [
 router.get("/:id", (req, res) => {
   const id = req.params.id;
 
+  const itemToGet = randomStuff.find((item) => item.id == id);
+  if (!itemToGet) {
+    res.status(404).json({
+      msg: "Your item is not in memory",
+    });
+  }
   res.status(200).json({
     msg: "Getting item details..",
     outputID: id,
-    data: randomStuff.find((item) => item.id == id) || "Your item is not in memory.",
+    data: randomStuff.find((item) => item.id == id),
   });
 });
 
@@ -22,15 +28,14 @@ router.put("/:id", (req, res) => {
 
   const itemToUpdate = randomStuff.find((item) => item.id == requestedId);
 
-  if (itemToUpdate) {
-    Object.assign(itemToUpdate, req.body);
-    res.status(200).json({
-      msg: "Updating your item's details...",
-      updatedId: requestedId,
-    });
-  } else {
+  if (!itemToUpdate) {
     res.status(404).json({ msg: "Your ID was not found in memory" });
   }
+  Object.assign(itemToUpdate, req.body);
+  res.status(200).json({
+    msg: "Updating your item's details...",
+    updatedId: requestedId,
+  });
 });
 
 router.delete("/:id", (req, res) => {
@@ -38,11 +43,17 @@ router.delete("/:id", (req, res) => {
 
   randomStuff = randomStuff.filter((item) => item.id != requestedId);
 
-  res.status(200).json({
-    msg: "Deleting item..",
-    deletedItem: requestedId,
-    remainingItems: randomStuff.length,
-  });
+  if (randomStuff) {
+    res.status(200).json({
+      msg: "Deleting item..",
+      deletedItem: requestedId,
+      remainingItems: randomStuff.length,
+    });
+  } else {
+    res.status(404).json({
+      msg: "The ID you entered is not in memory",
+    });
+  }
 });
 
 router.post("/", (req, res) => {

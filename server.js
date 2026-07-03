@@ -9,7 +9,7 @@ app.use(express.json());
 
 const apiRoutes = require("./src/routes/index");
 
-app.use("/api", apiRoutes);
+app.use("/items", apiRoutes);
 
 const server = http.createServer(app);
 
