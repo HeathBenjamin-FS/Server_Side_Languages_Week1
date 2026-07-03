@@ -1,27 +1,18 @@
-const { createServer } = require("node:http");
+const http = require("http");
+require("dotenv").config();
+const express = require("express");
+const morgan = require("morgan");
+const app = require("./src");
 
-const hostname = "127.0.0.1";
-const port = 3000;
+app.use(morgan("dev"));
+app.use(express.json());
 
-const todos = [
-  { id: 1, task: "Task one" },
-  { id: 2, task: "Task two" },
-  { id: 3, task: "Task three" },
-];
+const apiRoutes = require("./src/routes/index");
 
-const server = createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "application/json");
+app.use("/api", apiRoutes);
 
-  res.end(
-    JSON.stringify({
-      success: true,
-      method: req.method,
-      data: todos,
-    }),
-  );
-});
+const server = http.createServer(app);
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+server.listen(process.env.PORT, () => {
+  console.log(`Server running at ${process.env.PORT}`);
 });
